@@ -1,0 +1,179 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: url(../img/background.jpg);
+    background-size: cover;
+}
+
+.video-top {
+    width: 100%;
+    overflow: hidden;
+}
+
+h2 {
+    font-size: large;
+    font-weight: 700;
+    color: black;
+    float: left;
+}
+
+.face {
+    width: 35px;
+    height: 35px;
+    border-radius: 35px;
+}
+
+.card {
+    position: relative;
+    padding: 25px;
+    border-radius: 15px;
+    margin: 0 auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    border-left: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(40px);
+    margin-top: 3%;
+}
+
+.desc {
+    margin-top: 20px;
+    font-size: medium;
+    font-weight: 600;
+    color: black;
+}
+
+.desc-text {
+    font-size: small;
+    font-weight: 550;
+}
+
+.mask {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.uploader {
+    float: right;
+    margin-right: 20px;
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    line-height: 32px;
+}
+
+#flex-box {
+    margin-top: 13px;
+}
+
+#reply {
+    font-weight: 600;
+    font-size: large;
+}
+
+.replies {
+    width: 100%;
+}
+
+
+ul {
+    margin-top: 0px;
+    width: 100%;
+    overflow: hidden;
+    overflow-y: auto;
+    padding: 0px;
+    padding-top: 10px;
+    margin-bottom: 0px;
+}
+
+li {
+    float: left;
+    list-style: none;
+    overflow: hidden;
+    margin: 20px 0px;
+}
+
+.reply-head {
+    width: 40px;
+    height: 40px;
+    border-radius: 40px;
+    float: left;
+}
+
+.reply-box {
+    width: 85%;
+    float: left;
+    margin-left: 1%;
+    font-size: medium;
+}
+
+.reply-user {
+    overflow: hidden;
+    width: 100%;
+}
+
+.reply-user-name,
+.reply-user-level {
+    float: left;
+    font-size: small;
+    font-weight: 800;
+}
+
+.reply-user-level {
+    -webkit-text-stroke: 0.8px #698B69;
+    font-weight: 800;
+    color: #fff;
+}
+
+.reply-comment-box {
+    border-radius: 15px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+    line-height: 15px;
+    padding: 1px 10px;
+    font-size: small;
+    margin-top: 5px;
+}
+
+.reply-comment-name {
+    color: fuchsia;
+    font-weight: 800;
+}
+
+.tag-text {
+    padding: 5px 8px;
+    border-radius: 10px;
+    margin-right: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    font-size: small;
+    font-weight: 500;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* 滚动槽 */
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+}
+
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.5);
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+    background: rgba(0, 0, 0, 0.4);
+}

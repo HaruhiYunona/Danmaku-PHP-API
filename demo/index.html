@@ -1,0 +1,189 @@
+<html>
+
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta name="referrer" content="no-referrer" />
+    <title>Dplayer-弹幕接口测试Demo</title>
+    <script src="./static/js/hls.min.js"></script>
+    <script src="./static/js/md5.min.js"></script>
+    <script src="./static/js/DPlayer.min.js"></script>
+    <script src="./static/js/demo.js"></script>
+    <link rel="stylesheet" type="text/css" href="./static/css/styles.css">
+</head>
+
+<body>
+    <div class="mask">
+        <div class="card">
+            <div class="video-top">
+                <h2>演示视频</h2>
+                <div class="uploader" id="uploader">
+                    <img class="face" src="../demo/static/img/face.webp"> <span style="margin-left: 10px;" id="up">
+                        上传者
+                    </span>
+                </div>
+            </div>
+            <div id="flex-box">
+                <div id="dplayer1"></div>
+            </div>
+            <div class="desc">
+                视频简介
+                <p class="desc-text">
+                    这是一条视频简介
+                </p>
+                <p class="tag"></p>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 1%;">
+            <div id="reply">评论区</div>
+            <input type="hidden" id="aid">
+            <input type="hidden" id="page" value="1">
+            <ul>
+
+            </ul>
+        </div>
+    </div>
+    <script>
+        window.onload = function () {
+            demo();
+        }
+
+        /**
+         * 你的接口域名。请注意,如果你将本API作为网站的一个文件夹使用
+         * （例如你的网站是abc.com,你不想整个网站都用于弹幕API,将本API放进子文件夹,应完整写上本插件子文件夹路径）
+         */
+        let domain = 'http://localhost/Danmaku';
+
+        /**
+         * 这是一个大致的demo演示方法,具体写法请你自己构思
+         */
+        const demo = () => {
+
+            let dp = null;
+            let scrollFlag = 0;
+            let user = getUser();
+            let map = {
+                bv: 'BV1Na411r7tN', //视频BV号
+                p: 1 //视频分P
+            };
+
+            //拉取视频地址
+            fetch(domain + '/bilibili/parse/video?bv=' + map['bv'] + '&p=' + map['p']).then(res => res.json()).then(data => {
+                if (check(data)) {
+                    return false;
+                }
+                let url = data.url;
+                //拉取视频信息
+                fetch(domain + '/bilibili/parse/detail?bv=' + map['bv'] + '&p=' + map['p']).then(res => res.json()).then(data => {
+                    if (check(data)) {
+                        return false;
+                    }
+                    let detail = data.data;
+                    //应用获取到的视频信息
+                    document.getElementsByTagName('h2')[0].innerHTML = detail.title;
+                    document.getElementsByClassName('face')[0].setAttribute('src', detail.face);
+                    document.getElementById('up').innerHTML = detail.author;
+                    document.getElementsByClassName('desc-text')[0].innerHTML = detail.desc.replace(/\n/g, '<br>');
+                    layout();
+                    dp = new DPlayer({
+                        element: document.getElementById('dplayer1'),
+                        loop: true, //自动循环播放
+                        lang: 'zh-cn', //播放器语言
+                        hotkey: true, //开启热键控制
+                        autoplay: true, //自动播放
+                        volume: 1, //音量大小
+                        playbackSpeed: '[0.5,0.75,1,1.25,1.5,2]', //播放速度调节
+                        preload: 'auto', //预加载方式
+                        video: {
+                            url: url, //视频链接
+                            pic: detail.pic //视频封面
+                        },
+                        danmaku: {
+                            id: map['bv'], //视频对应的弹幕ID,这里我默认是BV
+                            api: domain + '/danmaku/server/entrance/',
+                            token: md5(user + map['bv']), //TOKEN,默认为MD5格式,内容为用户ID+视频ID。如果需要修改请和后台代码一起修改。如果不需要TOKEN校验请在config.php关闭
+                            unlimited: true, //弹幕数量限制
+                            user: user, //用户身份信息
+                            addition: [domain + '/danmaku/bilibili/get/v3/?bv=' + map['bv']] //外挂弹幕
+                        }
+                    });
+                });
+            });
+
+            //拉取视频ID链。因为很多接口不是以BV为参数的,我们需要先通过BV获取这个视频所有类型的ID
+            fetch(domain + '/bilibili/parse/chain?bv=' + map['bv'] + '&p=' + map['p']).then(res => res.json()).then(data => {
+                if (check(data)) {
+                    return false;
+                }
+                let chain = data.data;
+                document.getElementById('aid').setAttribute('value', chain.aid);
+                //拉取视频tag
+                fetch(domain + '/bilibili/parse/tag?aid=' + chain.aid).then(res => res.json()).then(data => {
+                    if (check(data)) {
+                        return false;
+                    }
+                    let tag = data.data;
+                    let tagLength = tag.length;
+                    let htm = '';
+                    for (let i = 0; tagLength > i; i++) {
+                        htm = htm + '<span class="tag-text">' + tag[i].name + '</span>';
+                    }
+                    document.getElementsByClassName('tag')[0].innerHTML = htm;
+                    layout();
+                });
+
+                flashList(chain.aid, 1);
+            });
+        }
+
+        //刷新评论区列表方法,用于演示评论区接口。这里和demo.js中的scrollList方法配合,分段刷新列表
+        const flashList = (aid, page) => {
+            fetch(domain + '/bilibili/parse/reply?aid=' + aid + '&page=' + page).then(res => res.json()).then(data => {
+                if (check(data)) {
+                    return false;
+                }
+                let reply = data.data;
+                let replyLength = reply.length;
+                let htm = '';
+                for (let i = 0; replyLength > i; i++) {
+                    let comment = reply[i].comment;
+                    let commentLength = comment.length;
+                    let htmComment = '';
+                    for (let n = 0; commentLength > n; n++) {
+                        htmComment = htmComment +
+                            '<p><span class="reply-comment-name">' + comment[n].name + '：</span>' +
+                            '<span>' + comment[n].content + '</span>' +
+                            '</p>';
+                    }
+                    if (htmComment != '') {
+                        htmComment = '<div class="reply-comment-box">' +
+                            htmComment +
+                            '</div>';
+                    }
+                    htm = htm + '<li class="replies">' +
+                        '<img class="reply-head" src="' + reply[i].avatar + '">' +
+                        '<div class="reply-box">' +
+                        '<div class="reply-user">' +
+                        '<div class="reply-user-name">' +
+                        reply[i].name +
+                        '</div>' +
+                        '<div class="reply-user-level">LV' + reply[i].level + '</div>' +
+                        '</div>' +
+                        '<div class="reply-content">' + reply[i].content.replace(/\n/g, '<br>') + '</div>' +
+                        htmComment +
+                        '</div>' +
+                        '</li>';
+                }
+                document.getElementsByTagName('ul')[0].innerHTML = document.getElementsByTagName('ul')[0].innerHTML + htm;
+                document.getElementsByTagName('ul')[0].removeEventListener('scroll', scrollList);
+                document.getElementsByTagName('ul')[0].addEventListener('scroll', scrollList);
+                scrollFlag = 0;
+                layout();
+            });
+        }
+
+
+    </script>
+</body>
+
+</html>

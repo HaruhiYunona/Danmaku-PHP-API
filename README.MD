@@ -531,9 +531,9 @@ demosrc::abc();调用demosrc内的abc方法
 
 **2.接收接口参数或者使用curl请用以下方法,而不是$\_POST和$\_GET**
 
-<?php
 
 ```php
+<?php
 namespace Danmaku;
 require_once __DIR__ . "/../autoLoader.php";  
 use Danmaku\Request;

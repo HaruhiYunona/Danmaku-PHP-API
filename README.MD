@@ -16,7 +16,7 @@
 >
 > **本站弹幕Demo:**  https://api.mdzz.pro/danmaku/server/entrance/v3/?id=BV1Na411r7tN
 > 
-> **我的个人站:**  https://mdzz.pro/demo/
+> **我的个人站:**  https://mdzz.pro/
 
 ### 一、安装
 

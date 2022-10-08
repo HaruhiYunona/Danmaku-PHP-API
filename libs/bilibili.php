@@ -213,7 +213,7 @@ class parse
             return Respons::json(['code' => 502, 'msg' => join(';', $verify['msg'])]);
         }
 
-        $b_page = Request::curlGet('https://api.bilibili.com/x/space/acc/info?mid=' . $mid . '&jsonp=jsonp', true);
+        $b_page = Request::curlGet('https://space.bilibili.com/' . $mid , true);
         preg_match('/(?<=window.__INITIAL_STATE__=).*?(?=;\(function\(\)\{)/', $b_page, $str);
         $allInfo = json_decode($str[0], true);
         $array = $allInfo['space']['info'];

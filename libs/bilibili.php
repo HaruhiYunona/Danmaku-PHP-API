@@ -47,7 +47,7 @@ class parse
         $bp->bvid($bv)->page($p);
         $bp->quality($q)->format($format);
         $result = json_decode($bp->result(), true);
-        return Respons::json($result,true);
+        return Respons::json($result, true);
     }
 
     /**
@@ -83,7 +83,7 @@ class parse
             'aid' => $content['data']['View']['aid'],
             'cid' => $content['data']['View']['pages'][$page - 1]['cid'],
             'p' => $page
-        ]],true);
+        ]], true);
     }
 
     /**
@@ -115,10 +115,10 @@ class parse
             'desc' => $content['data']['View']['desc'],
             'author' => $content['data']['Card']['card']['name'],
             'mid' => (int)$content['data']['Card']['card']['mid'],
-            'face'=>$content['data']['Card']['card']['face'],
+            'face' => $content['data']['Card']['card']['face'],
             'time' => $content['data']['View']['ctime'],
             'pic' => $content['data']['View']['pages'][$p - 1]['first_frame']
-        ]],true);
+        ]], true);
     }
 
     /**
@@ -143,7 +143,7 @@ class parse
             $tags[] = ['id' => $tag['tag_id'], 'name' => $tag['tag_name']];
         }
 
-        return Respons::json(['code' => 0, 'data' => $tags],true);
+        return Respons::json(['code' => 0, 'data' => $tags], true);
     }
 
     /**
@@ -213,17 +213,19 @@ class parse
             return Respons::json(['code' => 502, 'msg' => join(';', $verify['msg'])]);
         }
 
-        $content = json_decode(Request::curlGet('https://api.bilibili.com/x/space/acc/info?mid=' . $mid . '&jsonp=jsonp', true), true);
-
-        if ($content['code'] !== 0) {
+        $b_page = Request::curlGet('https://api.bilibili.com/x/space/acc/info?mid=' . $mid . '&jsonp=jsonp', true);
+        preg_match('/(?<=window.__INITIAL_STATE__=).*?(?=;\(function\(\)\{)/', $b_page, $str);
+        $allInfo = json_decode($str[0], true);
+        $array = $allInfo['space']['info'];
+        if (empty($array['mid'])) {
             return Respons::json(['code' => 404, 'msg' => '未找到该用户']);
         }
 
-        $fansCard = ($content['data']['fans_medal']['wear']) ?
+        $fansCard = ($array['fans_medal']['wear']) ?
             [
-                'name' => $content['data']['fans_medal']['medal']['medal_name'],
-                'level' => $content['data']['fans_medal']['medal']['level'],
-                'mid' => $content['data']['fans_medal']['medal']['target_id']
+                'name' => $array['fans_medal']['medal']['medal_name'],
+                'level' => $array['fans_medal']['medal']['level'],
+                'mid' => $array['fans_medal']['medal']['target_id']
             ] : [
                 'name' => null,
                 'level' => null,
@@ -231,13 +233,13 @@ class parse
             ];
 
         return Respons::json(['code' => 0, 'data' => [
-            'mid' => $content['data']['mid'],
-            'name' => $content['data']['name'],
-            'sex' => $content['data']['sex'],
-            'face' => $content['data']['face'],
-            'level' => $content['data']['level'],
-            'banner' => $content['data']['top_photo'],
+            'mid' => $array['mid'],
+            'name' => $array['name'],
+            'sex' => $array['sex'],
+            'face' => $array['face'],
+            'level' => $array['level'],
+            'banner' => $array['top_photo'],
             'fans_card' => $fansCard
-        ]],true);
+        ]], true);
     }
 }

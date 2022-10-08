@@ -176,6 +176,8 @@ class Request
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_REDIR_PROTOCOLS, -1);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); 
         if ($zip) {
             curl_setopt($ch, CURLOPT_ENCODING, "gzip,deflate");
         }
